@@ -5,14 +5,19 @@ services:
     ports:
       - "6379:6379"
   mysql:
-    build: ./mysql
+    image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
     ports:
       - "3307:3306"
+    volumes: 
+      - ./mysql/sqls/:/docker-entrypoint-initdb.d
   backend:
     build: ./backend
     ports: 
       - "80:5000"
+    depends_on:
+      - "mysql"
+      - "redis"
