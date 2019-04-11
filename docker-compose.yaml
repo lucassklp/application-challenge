@@ -1,8 +1,18 @@
 version: '3'
 services:
   redis:
-    image: "redis:5.0"
+    build: ./redis
+    ports:
+      - "6379:6379"
+  mysql:
+    build: ./mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - "3307:3306"
   backend:
     build: ./backend
     ports: 
-      - "5000:5000"
+      - "80:5000"
