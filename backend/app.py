@@ -1,19 +1,21 @@
 from flask import Flask
-import redis
+from flask_restful import Api
+from persistence import mysql
 
-
-r = redis.Redis(host='redis', port=6379, db=0)
-r.set('abc', 'def')
-
-
+# Initializing
 app = Flask(__name__)
+mysql.db = mysql.configure(app)
+api = Api(app)
 
+# Configuring endpoints
+from presentation import auth_endpoint, user_endpoint
 
-@app.route('/')
-def hello_world():
-    return r.get('abc')
-
-
+api.add_resource(user_endpoint.UserRegistration, '/registration')
+api.add_resource(auth_endpoint.UserLogin, '/login')
+api.add_resource(auth_endpoint.UserLogoutAccess, '/logout/access')
+api.add_resource(auth_endpoint.UserLogoutRefresh, '/logout/refresh')
+api.add_resource(auth_endpoint.TokenRefresh, '/token/refresh')
+api.add_resource(user_endpoint.AllUsers, '/users')
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
