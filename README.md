@@ -54,6 +54,8 @@ A solução seria a mesma da **Base A**, com um pequeno _improvement_: Utilizar 
 
 Dessa forma, garantimos a mesma segurança da **Base A**, porém podemos fazer múltiplas leituras simultâneamente, o que diminui o tempo de consulta. Inclusive podemos utilizar uma réplica exclusivamente para o sistema de **_Machine Learning_**
 
+Além dessa abordagem, uma arquitetura que poderia ser bastante útil para aumentar a performance do banco de dados seria a [arquitetura shard](https://en.wikipedia.org/wiki/Shard_(database_architecture)), que permite leitura e escrita de forma paralela, o que aumentaria o throughput de I/O. Nesse caso, poderiamos utilizar uma instância de banco de dados por estado, mantendo as informações sempre organizadas.
+
 Alguns outros _tunnings_ ainda podem ser feitos, como por exemplo, a criação de índices no banco de dados, a fim de tornar a busca mais rápida.
 
 ## Problema 3 - **Base C:**
@@ -96,3 +98,61 @@ A citação acima se encaixa muito bem nesse contexto. Não tem como obter todas
 # A aplicação desenvolvida
 
 Toda a aplicação foi desenvolvida usando docker, para facilitar a comunicação entre os serviços, e também para rodar em todos os ambientes de forma fácil.
+
+Para executar o projeto, basta executar os seguintes comandos:
+
+**docker-compose build --no-cache**
+
+**docker-compose up**
+
+
+## Modelagem do banco de dados:
+
+# ![](modeling.png)
+
+
+## Rotas
+
+### Geração do Token JWT
+[POST] http://localhost/login
+
+[HEADER] ContentType -> "application/json"
+
+[BODY] {"username": "admin", "password": "admin123456"}
+
+
+### Consulta na base A
+[POST] http://localhost/debts
+
+[HEADER] Authorization -> "Bearer [token]"
+
+[HEADER] ContentType -> "application/json"
+
+[BODY] {"cpf": "00000000191"}
+
+ou
+
+[BODY] {"cpf": "00000014141"}
+
+
+### Consulta na base B
+[POST] http://localhost/score
+
+[HEADER] Authorization -> "Bearer [token]"
+
+[HEADER] ContentType -> "application/json"
+
+[BODY] {"cpf": "00000000191"}
+
+ou
+
+[BODY] {"cpf": "00000014141"}
+
+### Consulta na base C (Rastreamento de dados relacionados ao CPF)
+[POST] http:localhost/track-cpf
+
+[HEADER] Authorization -> "Bearer [token]"
+
+[HEADER] ContentType -> "application/json"
+
+[BODY] {"cpf": "00000000000"}
