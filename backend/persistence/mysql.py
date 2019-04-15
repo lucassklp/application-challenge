@@ -8,10 +8,10 @@ def configure(app):
     pymysql.install_as_MySQLdb()
 
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:example@localhost:3307/base_a'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:example@mysql/auth_base'
     app.config['SQLALCHEMY_BINDS'] = {
+        'base_a': 'mysql://root:example@mysql/base_a',
         'base_b': 'mysql://root:example@mysql/base_b',
-        'users': 'mysql://mysql/users'
     }
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'example'

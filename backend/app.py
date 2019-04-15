@@ -1,21 +1,27 @@
+import time
 from flask import Flask
 from flask_restful import Api
 from persistence import mysql
+import jwt_configuration
+
+# Delay para script do banco de dados
+print('Waiting for database script init...')
+time.sleep(30)
 
 # Initializing
 app = Flask(__name__)
 mysql.db = mysql.configure(app)
 api = Api(app)
+jwt_configuration.jwt = jwt_configuration.configure(app)
 
 # Configuring endpoints
-from presentation import auth_endpoint, user_endpoint
+from presentation import auth_endpoint, debts_endpoint, score_endpoint, track_cpf_endpoint
 
-api.add_resource(user_endpoint.UserRegistration, '/registration')
-api.add_resource(auth_endpoint.UserLogin, '/login')
-api.add_resource(auth_endpoint.UserLogoutAccess, '/logout/access')
-api.add_resource(auth_endpoint.UserLogoutRefresh, '/logout/refresh')
-api.add_resource(auth_endpoint.TokenRefresh, '/token/refresh')
-api.add_resource(user_endpoint.AllUsers, '/users')
+api.add_resource(auth_endpoint.AuthEndpoint, '/login')
+api.add_resource(debts_endpoint.DebtsEndpoint, '/debts')
+api.add_resource(score_endpoint.ScoreEndpoint, '/score')
+api.add_resource(track_cpf_endpoint.TrackCpfEndpoint, '/track-cpf')
+
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')

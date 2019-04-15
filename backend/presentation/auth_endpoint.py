@@ -1,17 +1,14 @@
-from flask_restful import Resource
+from flask_restful import Resource, request
+from flask_jwt_extended import create_access_token
+from business import auth_service
 
-class UserLogin(Resource):
+class AuthEndpoint(Resource):
     def post(self):
-        return {'message': 'User login'}
+        json = request.get_json()
 
-class UserLogoutAccess(Resource):
-    def post(self):
-        return {'message': 'User logout'}
+        user = auth_service.login(json['username'], json['password'])
+        if(user != None):
+            data = {'user_id': user.id, 'username': user.username, 'email': user.email}
+            return {'token': create_access_token(data)}
 
-class UserLogoutRefresh(Resource):
-    def post(self):
-        return {'message': 'User logout'}
-
-class TokenRefresh(Resource):
-    def post(self):
-        return {'message': 'Token refresh'}
+        return {'message': 'invalid-credentials'}, 401
